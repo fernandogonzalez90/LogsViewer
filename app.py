@@ -4,13 +4,12 @@ from flask import Flask, render_template, request, abort, redirect, url_for, fla
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 app = Flask(__name__)
-BASE_LOG_DIR = "/logs" # Asegúrate de que esta ruta exista y tenga permisos
+BASE_LOG_DIR = "/logs"
 
-# --- NUEVO: Clave secreta para sesiones seguras ---
 # ¡Cámbiala por una cadena de caracteres aleatoria y segura!
-app.secret_key = 'tu-clave-secreta-aqui'
+app.secret_key = 'Dp0iSkjQyKysqe1vCgx7H'
 
-# --- NUEVO: Configuración de Flask-Login ---
+# --- Configuración de Flask-Login ---
 login_manager = LoginManager()
 login_manager.init_app(app)
 # Si un usuario no autenticado intenta acceder, será redirigido a 'login'.
@@ -18,7 +17,7 @@ login_manager.login_view = 'login'
 login_manager.login_message = "Debes iniciar sesión para ver esta página de logs."
 login_manager.login_message_category = "info"
 
-# --- NUEVO: Modelo de Usuario simple ---
+# --- Modelo de Usuario simple ---
 class User(UserMixin):
     def __init__(self, id):
         self.id = id
@@ -30,12 +29,12 @@ class User(UserMixin):
             return User(user_id)
         return None
 
-# --- NUEVO: Carga de usuario para Flask-Login ---
+# --- Carga de usuario para Flask-Login ---
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
 
-# --- NUEVO: Función para leer credenciales ---
+# --- Función para leer credenciales ---
 def get_credentials():
     """Lee el usuario y la contraseña desde el archivo user.txt."""
     try:
@@ -55,7 +54,7 @@ def safe_join(base, *paths):
         abort(403)
     return final_path
 
-# --- NUEVO: Ruta de Login ---
+# --- Ruta de Login ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -138,7 +137,7 @@ def view_log(file_path):
         highlighted_lines=highlighted_lines,
         file_path=file_path,
         query=query,
-        user=current_user # Pasamos el usuario a la plantilla
+        user=current_user
     )
 
 if __name__ == "__main__":

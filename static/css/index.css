@@ -1,3 +1,4 @@
+/* Tus variables y estilos base */
 :root {
   --bs-dark-rgb: 33, 37, 41;
   --bs-body-bg: #1a1d20;
@@ -9,8 +10,29 @@ body {
   color: var(--bs-body-color);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
+  /* IMPORTANTE: Espacio para la barra de navegación fija */
+  padding-top: 85px; 
 }
 
+/* --- NUEVO: Estilo para la Barra de Navegación Fija --- */
+.navbar.fixed-top {
+  background: rgba(33, 37, 41, 0.75); /* Fondo semitransparente */
+  backdrop-filter: blur(10px); /* Efecto de desenfoque */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.navbar .navbar-brand,
+.navbar .navbar-text {
+    color: var(--bs-body-color);
+}
+
+.navbar .navbar-brand:hover {
+    color: #ffffff;
+}
+
+/* Contenedor principal con tu estilo glassmorphism */
 .main-container {
   background: rgba(33, 37, 41, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -18,21 +40,26 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   border-radius: 16px;
   padding: 2rem;
-  margin-top: 2rem;
+  margin-bottom: 2rem; /* Espacio al final de la página */
 }
 
-.header-section {
-  background: linear-gradient(
-    135deg,
-    rgba(13, 202, 240, 0.1),
-    rgba(102, 126, 234, 0.1)
-  );
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border: 1px solid rgba(13, 202, 240, 0.2);
+/* Encabezado de la ruta (ligeramente ajustado) */
+.path-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1.5rem;
 }
 
+/* Tu estilo para resaltar la ruta */
+.path-highlight {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* Tus estilos para Breadcrumbs */
 .breadcrumb {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -49,14 +76,13 @@ body {
 
 .breadcrumb-item a:hover {
   color: #ffffff;
-  transform: translateX(3px);
 }
 
 .breadcrumb-item.active {
-  color: #ffffff;
-  font-weight: 600;
+  color: #adb5bd;
 }
 
+/* Tus estilos para la lista de archivos (vista de lista vertical) */
 .file-list {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
@@ -69,7 +95,7 @@ body {
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
-  padding: 1rem 1.5rem;
+  padding: 0; /* Padding se mueve al link para mejor área de click */
 }
 
 .file-item:hover {
@@ -94,6 +120,7 @@ body {
   align-items: center;
   font-weight: 500;
   transition: all 0.3s ease;
+  padding: 1rem 1.5rem; /* Padding aquí */
 }
 
 .file-link:hover {
@@ -106,6 +133,7 @@ body {
   transition: all 0.3s ease;
 }
 
+/* Tus colores de iconos */
 .folder-icon {
   color: #ffc107;
 }
@@ -123,6 +151,7 @@ body {
   font-size: 1.1rem;
 }
 
+/* Tus estilos para el estado vacío */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -136,6 +165,7 @@ body {
   color: #0dcaf0;
 }
 
+/* Tu animación de entrada */
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
@@ -149,12 +179,4 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.path-highlight {
-  background: linear-gradient(90deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 700;
 }
