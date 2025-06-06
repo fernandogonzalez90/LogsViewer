@@ -1,0 +1,160 @@
+:root {
+  --bs-dark-rgb: 33, 37, 41;
+  --bs-body-bg: #1a1d20;
+  --bs-body-color: #e9ecef;
+}
+
+body {
+  background: linear-gradient(135deg, #1a1d20 0%, #2d3436 100%);
+  color: var(--bs-body-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+}
+
+.main-container {
+  background: rgba(33, 37, 41, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.header-section {
+  background: linear-gradient(
+    135deg,
+    rgba(13, 202, 240, 0.1),
+    rgba(102, 126, 234, 0.1)
+  );
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(13, 202, 240, 0.2);
+}
+
+.breadcrumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.breadcrumb-item a {
+  color: #0dcaf0;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.breadcrumb-item.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.file-list {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.file-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  padding: 1rem 1.5rem;
+}
+
+.file-item:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(13, 202, 240, 0.1),
+    rgba(102, 126, 234, 0.1)
+  );
+  transform: translateX(5px);
+  border-left: 4px solid #0dcaf0;
+  box-shadow: 0 4px 20px rgba(13, 202, 240, 0.2);
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-link {
+  color: #e9ecef;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.file-link:hover {
+  color: #ffffff;
+}
+
+.file-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  transition: all 0.3s ease;
+}
+
+.folder-icon {
+  color: #ffc107;
+}
+
+.file-icon-doc {
+  color: #0dcaf0;
+}
+
+.file-item:hover .file-icon {
+  transform: scale(1.2);
+}
+
+.file-name {
+  flex-grow: 1;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6c757d;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  color: #0dcaf0;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.path-highlight {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
