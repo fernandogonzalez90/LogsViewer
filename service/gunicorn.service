@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn instance para correr Log Viewer
+After=network.target
+
+[Service]
+User=developer
+Group=developer
+
+WorkingDirectory=/home/developer/log_viewer
+
+ExecStart=~/log_viewer/venv/bin/gunicorn --workers 3 --bind unix:gunicorn.sock -m 007 app:app
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
