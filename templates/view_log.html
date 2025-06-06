@@ -1,639 +1,267 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visor de Logs - {{ file_path }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        :root {
-            --bs-dark-rgb: 33, 37, 41;
-            --bs-body-bg: #1a1d20;
-            --bs-body-color: #e9ecef;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1d20 0%, #2d3436 100%);
-            color: var(--bs-body-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-        }
-
-        .navbar-custom {
-            background: rgba(var(--bs-dark-rgb), 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            padding: 0.5rem 0; /* Reducido de 1rem */
-        }
-
-        .card-custom {
-            background: rgba(var(--bs-dark-rgb), 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-            padding: 0.75rem; /* Reducido de 1.5rem */
-        }
-
-        .log-container {
-            max-height: 75vh; /* Aumentado de 65vh para dar más espacio */
-            overflow-y: auto;
-            background: linear-gradient(145deg, #ffffff, #f8f9fa);
-            color: #212529;
-            border-radius: 8px; /* Reducido de 12px */
-            padding: 0.75rem; /* Reducido de 1.5rem */
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 0.875rem;
-            line-height: 1.4; /* Reducido de 1.6 */
-        }
-
-        .log-container::-webkit-scrollbar {
-            width: 6px; /* Reducido de 8px */
-        }
-
-        .log-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        .log-container::-webkit-scrollbar-thumb {
-            background: #6c757d;
-            border-radius: 3px;
-        }
-
-        .log-container::-webkit-scrollbar-thumb:hover {
-            background: #495057;
-        }
-
-        .log-line-item {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 0.4rem 0; /* Reducido de 0.75rem */
-            margin-bottom: 1px; /* Reducido de 2px */
-            word-break: break-word;
-            transition: background-color 0.2s ease; /* Solo transición de color, no de tamaño */
-            border-radius: 3px;
-        }
-
-        .log-line-item:hover {
-            background-color: rgba(0, 123, 255, 0.05);
-            /* Eliminado: transform: translateX(2px); */
-        }
-
-        .log-line-item:last-child {
-            border-bottom: none;
-        }
-
-        .active-match {
-            background-color: #fff3cd !important; /* Cambiado de gradient a color sólido */
-            color: #856404 !important;
-            font-weight: 600;
-            border-left: 3px solid #ffc107 !important; /* Cambiado de border completo a solo izquierdo */
-            padding-left: 0.5rem !important;
-            /* Eliminados: border-radius, margin, box-shadow, animation */
-        }
-
-        /* Eliminada la animación pulse-highlight */
-
-        .highlight {
-            background-color: #ffdd57; /* Cambiado de gradient a color sólido */
-            color: #212529; /* Cambiado a color oscuro para mejor contraste */
-            padding: 0.1em 0.3em; /* Reducido de 0.2em 0.4em */
-            border-radius: 3px; /* Reducido de 4px */
-            font-weight: 600;
-            /* Eliminados: box-shadow, animation */
-        }
-
-        .form-control:focus, .form-select:focus, .form-check-input:focus {
-            border-color: #0dcaf0;
-            box-shadow: 0 0 0 0.2rem rgba(13, 202, 240, 0.25);
-        }
-
-        .btn-outline-light:hover {
-            background-color: #0dcaf0;
-            border-color: #0dcaf0;
-            /* Eliminado: transform: translateY(-1px); */
-            box-shadow: 0 2px 8px rgba(13, 202, 240, 0.3);
-        }
-
-        .breadcrumb-item a {
-            transition: color 0.2s ease; /* Solo transición de color */
-            color: #0dcaf0;
-        }
-
-        .breadcrumb-item a:hover {
-            color: #0aa9c7 !important;
-            /* Eliminado: transform: translateX(2px); */
-        }
-
-        .breadcrumb-item.active {
-            color: var(--bs-body-color) !important;
-        }
-
-        .filter-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px; /* Reducido de 12px */
-            padding: 0.75rem; /* Reducido de 1.5rem */
-            margin-bottom: 0.75rem; /* Reducido de 1rem */
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stats-badge {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 0.3rem 0.75rem; /* Reducido de 0.5rem 1rem */
-            border-radius: 16px; /* Reducido de 20px */
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); /* Reducido de 0 4px 15px */
-            min-width: 120px;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem 1rem; /* Reducido de 3rem 1rem */
-            color: #6c757d;
-        }
-
-        .empty-state i {
-            font-size: 3rem; /* Reducido de 4rem */
-            margin-bottom: 0.75rem; /* Reducido de 1rem */
-            opacity: 0.5;
-        }
-
-        .level-badge {
-            display: inline-block;
-            padding: 0.2rem 0.4rem; /* Reducido de 0.25rem 0.5rem */
-            border-radius: 3px; /* Reducido de 4px */
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.4rem; /* Reducido de 0.5rem */
-        }
-
-        .level-debug { background-color: #6c757d; color: white; }
-        .level-info { background-color: #0dcaf0; color: white; }
-        .level-error { background-color: #dc3545; color: white; }
-        .level-warn { background-color: #ffc107; color: #000; }
-
-        /* Simplificada la animación fade-in */
-        .fade-in {
-            animation: fadeIn 0.2s ease-in; /* Reducido de 0.3s */
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-            /* Eliminado el transform para evitar movimiento */
-        }
-
-        /* Reducir espacios en formularios */
-        .form-label {
-            margin-bottom: 0.25rem; /* Reducido de 0.5rem */
-        }
-
-        .form-check {
-            min-height: 1.3rem; /* Reducido de 1.5rem */
-            padding-left: 1.5em; /* Reducido de 1.75em */
-        }
-
-        /* Reducir espacios en el header */
-        h2 {
-            font-size: 1.5rem; /* Reducido de 2rem */
-            margin-bottom: 0.25rem !important; /* Reducido de 0.5rem */
-        }
-
-        /* Reducir espacios en los botones */
-        .btn {
-            padding: 0.25rem 0.5rem; /* Reducido de 0.375rem 0.75rem */
-        }
-
-        /* Reducir espacios en los breadcrumbs */
-        .breadcrumb {
-            margin-bottom: 0.5rem; /* Reducido de 1rem */
-            padding: 0.5rem 0; /* Reducido de 1rem */
-        }
-    </style>
-</head>
-<body>
-    <div class="container-fluid px-2"> <!-- Reducido de px-4 -->
-        <!-- Header -->
-        <div class="sticky-header navbar-custom">
-            <div class="card-custom rounded-3">
-                <div class="d-flex align-items-center mb-2"> <!-- Reducido de mb-3 -->
-                    <i class="bi bi-file-earmark-text-fill text-info me-2" style="font-size: 1.5rem;"></i> <!-- Reducido de 2rem y me-3 -->
-                    <div>
-                        <h2 class="text-light mb-0">Visor de Logs</h2>
-                        <code class="text-info fs-6">{{ file_path }}</code>
-                    </div>
-                </div>
-
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb" class="mb-2"> <!-- Reducido de mb-4 -->
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item">
-                            <a href="{{ url_for('browse', req_path='/'.join(file_path.split('/')[:-1]) if '/' in file_path else '') }}" class="text-decoration-none d-flex align-items-center">
-                                <i class="bi bi-folder2-open me-1"></i> <!-- Reducido de me-2 -->
-                                Volver a {{ '/'.join(file_path.split('/')[:-1]) if '/' in file_path else 'logs' }}/
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            {{ file_path.split('/')[-1] }}
-                        </li>
-                    </ol>
-                </nav>
-
-                <!-- Search Section -->
-                <div class="filter-section">
-                    <form id="filterForm" class="row g-2 align-items-end"> <!-- Reducido de g-3 -->
-                        <div class="col-md-6">
-                            <label for="searchInput" class="form-label text-light small mb-1"> <!-- Añadido small y mb-1 -->
-                                <i class="bi bi-search me-1"></i>Buscar en logs
-                            </label>
-                            <div class="input-group input-group-sm"> <!-- Añadido input-group-sm -->
-                                <input type="text" id="searchInput" class="form-control bg-dark text-light border-secondary" 
-                                       placeholder="Ingresa términos de búsqueda..." value="{{ query | e }}">
-                                <button type="button" id="clearSearch" class="btn btn-outline-danger btn-sm" title="Limpiar búsqueda">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-sm" title="Buscar">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-auto">
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Navegación de coincidencias">
-                                <button type="button" id="prevBtn" class="btn btn-outline-light" title="Anterior">
-                                    <i class="bi bi-chevron-left"></i>
-                                </button>
-                                <button type="button" id="nextBtn" class="btn btn-outline-light" title="Siguiente">
-                                    <i class="bi bi-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-auto">
-                            <span class="stats-badge" id="matchInfo">Cargando...</span>
-                        </div>
-                    </form>
-
-                    <!-- Secondary Filters -->
-                    <div class="row g-2 mt-2 pt-2 border-top border-secondary"> <!-- Reducido de g-3 mt-3 pt-3 -->
-                        <div class="col-md-4">
-                            <label class="form-label text-light small mb-1"> <!-- Añadido small y mb-1 -->
-                                <i class="bi bi-funnel me-1"></i>Nivel de Log
-                            </label>
-                            <div class="d-flex flex-wrap gap-2"> <!-- Reducido de gap-3 -->
-                                <div class="form-check form-check-inline m-0"> <!-- Añadido form-check-inline y m-0 -->
-                                    <input class="form-check-input level-check filter-control" type="checkbox" value="DEBUG" id="levelDebug">
-                                    <label class="form-check-label text-light" for="levelDebug">
-                                        <span class="level-badge level-debug">DEBUG</span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline m-0">
-                                    <input class="form-check-input level-check filter-control" type="checkbox" value="INFO" id="levelInfo">
-                                    <label class="form-check-label text-light" for="levelInfo">
-                                        <span class="level-badge level-info">INFO</span>
-                                    </label>
-                                </div>
-                                <div class="form-check form-check-inline m-0">
-                                    <input class="form-check-input level-check filter-control" type="checkbox" value="ERROR" id="levelError">
-                                    <label class="form-check-label text-light" for="levelError">
-                                        <span class="level-badge level-error">ERROR</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label text-light small mb-1" for="dateFilter"> <!-- Añadido small y mb-1 -->
-                                <i class="bi bi-calendar3 me-1"></i>Fecha
-                            </label>
-                            <input type="date" class="form-control form-control-sm bg-dark text-light border-secondary filter-control" id="dateFilter">
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label text-light small mb-1"> <!-- Añadido small y mb-1 -->
-                                <i class="bi bi-gear me-1"></i>Opciones
-                            </label>
-                            <div class="form-check">
-                                <input class="form-check-input filter-control" type="checkbox" id="loggerGXU">
-                                <label class="form-check-label text-light small" for="loggerGXU"> <!-- Añadido small -->
-                                    Solo GeneXusUserLog
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" id="clearAllFilters" class="btn btn-outline-warning btn-sm w-100"> <!-- Añadido btn-sm -->
-                                <i class="bi bi-arrow-clockwise me-1"></i>Limpiar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/view_log.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid px-2">
+      <!-- Reducido de px-4 -->
+      <!-- Header -->
+      <div class="sticky-header navbar-custom">
+        <div class="card-custom rounded-3">
+          <div class="d-flex align-items-center mb-2">
+            <!-- Reducido de mb-3 -->
+            <i
+              class="bi bi-file-earmark-text-fill text-info me-2"
+              style="font-size: 1.5rem"
+            ></i>
+            <!-- Reducido de 2rem y me-3 -->
+            <div>
+              <h2 class="text-light mb-0">Visor de Logs</h2>
+              <code class="text-info fs-6">{{ file_path }}</code>
             </div>
-        </div>
+            <div class="ms-auto d-flex align-items-center">
+              <span class="text-light small me-3"
+                >¡Hola, <strong>{{ user.id }}</strong>!</span
+              >
+              <a
+                href="{{ url_for('logout') }}"
+                class="btn btn-outline-danger"
+                style="
+                  --bs-btn-padding-y: 0.15rem;
+                  --bs-btn-padding-x: 0.5rem;
+                  --bs-btn-font-size: 0.75rem;
+                "
+              >
+                <i class="bi bi-box-arrow-right me-1"></i>Salir
+              </a>
+            </div>
+          </div>
 
-        <!-- Log Container -->
-        <div class="log-container mt-2 fade-in" id="logContainer"> <!-- Reducido de mt-4 -->
-            <!-- Las líneas de log se insertarán aquí por Jinja -->
-            {% if highlighted_lines %}
-                {% for backend_idx, line_content in highlighted_lines %}
-                    <div class="log-line-item {% if backend_idx is not none %}backend-match-initial{% endif %}" 
-                         data-original-text="{{ line_content | e }}">
-                        {{ line_content | e }}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-file-earmark-excel"></i>
-                    <p>No hay líneas de log para mostrar o el archivo está vacío.</p>
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb" class="mb-2">
+            <!-- Reducido de mb-4 -->
+            <ol class="breadcrumb mb-0">
+              <li class="breadcrumb-item">
+                <a
+                  href="{{ url_for('browse', req_path='/'.join(file_path.split('/')[:-1]) if '/' in file_path else '') }}"
+                  class="text-decoration-none d-flex align-items-center"
+                >
+                  <i class="bi bi-folder2-open me-1"></i>
+                  <!-- Reducido de me-2 -->
+                  Volver a {{ '/'.join(file_path.split('/')[:-1]) if '/' in
+                  file_path else 'logs' }}/
+                </a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">
+                {{ file_path.split('/')[-1] }}
+              </li>
+            </ol>
+          </nav>
+
+          <!-- Search Section -->
+          <div class="filter-section">
+            <form id="filterForm" class="row g-2 align-items-end">
+              <!-- Reducido de g-3 -->
+              <div class="col-md-6">
+                <label
+                  for="searchInput"
+                  class="form-label text-light small mb-1"
+                >
+                  <!-- Añadido small y mb-1 -->
+                  <i class="bi bi-search me-1"></i>Buscar en logs
+                </label>
+                <div class="input-group input-group-sm">
+                  <!-- Añadido input-group-sm -->
+                  <input
+                    type="text"
+                    id="searchInput"
+                    class="form-control bg-dark text-light border-secondary"
+                    placeholder="Ingresa términos de búsqueda..."
+                    value="{{ query | e }}"
+                  />
+                  <button
+                    type="button"
+                    id="clearSearch"
+                    class="btn btn-outline-danger btn-sm"
+                    title="Limpiar búsqueda"
+                  >
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    title="Buscar"
+                  >
+                    <i class="bi bi-search"></i>
+                  </button>
                 </div>
-            {% endif %}
+              </div>
+
+              <div class="col-auto">
+                <div
+                  class="btn-group btn-group-sm"
+                  role="group"
+                  aria-label="Navegación de coincidencias"
+                >
+                  <button
+                    type="button"
+                    id="prevBtn"
+                    class="btn btn-outline-light"
+                    title="Anterior"
+                  >
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <button
+                    type="button"
+                    id="nextBtn"
+                    class="btn btn-outline-light"
+                    title="Siguiente"
+                  >
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-auto">
+                <span class="stats-badge" id="matchInfo">Cargando...</span>
+              </div>
+            </form>
+
+            <!-- Secondary Filters -->
+            <div class="row g-2 mt-2 pt-2 border-top border-secondary">
+              <!-- Reducido de g-3 mt-3 pt-3 -->
+              <div class="col-md-4">
+                <label class="form-label text-light small mb-1">
+                  <!-- Añadido small y mb-1 -->
+                  <i class="bi bi-funnel me-1"></i>Nivel de Log
+                </label>
+                <div class="d-flex flex-wrap gap-2">
+                  <!-- Reducido de gap-3 -->
+                  <div class="form-check form-check-inline m-0">
+                    <!-- Añadido form-check-inline y m-0 -->
+                    <input
+                      class="form-check-input level-check filter-control"
+                      type="checkbox"
+                      value="DEBUG"
+                      id="levelDebug"
+                    />
+                    <label class="form-check-label text-light" for="levelDebug">
+                      <span class="level-badge level-debug">DEBUG</span>
+                    </label>
+                  </div>
+                  <div class="form-check form-check-inline m-0">
+                    <input
+                      class="form-check-input level-check filter-control"
+                      type="checkbox"
+                      value="INFO"
+                      id="levelInfo"
+                    />
+                    <label class="form-check-label text-light" for="levelInfo">
+                      <span class="level-badge level-info">INFO</span>
+                    </label>
+                  </div>
+                  <div class="form-check form-check-inline m-0">
+                    <input
+                      class="form-check-input level-check filter-control"
+                      type="checkbox"
+                      value="ERROR"
+                      id="levelError"
+                    />
+                    <label class="form-check-label text-light" for="levelError">
+                      <span class="level-badge level-error">ERROR</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-3">
+                <label
+                  class="form-label text-light small mb-1"
+                  for="dateFilter"
+                >
+                  <!-- Añadido small y mb-1 -->
+                  <i class="bi bi-calendar3 me-1"></i>Fecha
+                </label>
+                <input
+                  type="date"
+                  class="form-control form-control-sm bg-dark text-light border-secondary filter-control"
+                  id="dateFilter"
+                />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label text-light small mb-1">
+                  <!-- Añadido small y mb-1 -->
+                  <i class="bi bi-gear me-1"></i>Opciones
+                </label>
+                <div class="form-check">
+                  <input
+                    class="form-check-input filter-control"
+                    type="checkbox"
+                    id="loggerGXU"
+                  />
+                  <label
+                    class="form-check-label text-light small"
+                    for="loggerGXU"
+                  >
+                    <!-- Añadido small -->
+                    Solo GeneXusUserLog
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-2 d-flex align-items-end">
+                <button
+                  type="button"
+                  id="clearAllFilters"
+                  class="btn btn-outline-warning btn-sm w-100"
+                >
+                  <!-- Añadido btn-sm -->
+                  <i class="bi bi-arrow-clockwise me-1"></i>Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Log Container -->
+      <div class="log-container mt-2 fade-in" id="logContainer">
+        <!-- Reducido de mt-4 -->
+        <!-- Las líneas de log se insertarán aquí por Jinja -->
+        {% if highlighted_lines %} {% for backend_idx, line_content in
+        highlighted_lines %}
+        <div
+          class="log-line-item {% if backend_idx is not none %}backend-match-initial{% endif %}"
+          data-original-text="{{ line_content | e }}"
+        >
+          {{ line_content | e }}
+        </div>
+        {% endfor %} {% else %}
+        <div class="empty-state">
+          <i class="bi bi-file-earmark-excel"></i>
+          <p>No hay líneas de log para mostrar o el archivo está vacío.</p>
+        </div>
+        {% endif %}
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        // Elements
-        const logContainer = document.getElementById('logContainer');
-        const allLogLineElements = Array.from(logContainer.querySelectorAll('.log-line-item'));
-        
-        const searchInput = document.getElementById('searchInput');
-        const filterForm = document.getElementById('filterForm');
-        const clearBtn = document.getElementById('clearSearch');
-        const clearAllBtn = document.getElementById('clearAllFilters');
-        const filterControls = document.querySelectorAll('.filter-control');
-        const matchInfoEl = document.getElementById('matchInfo');
-        const nextBtn = document.getElementById('nextBtn');
-        const prevBtn = document.getElementById('prevBtn');
-
-        // State
-        let currentMatches = [];
-        let currentMatchIndex = -1;
-        let isSearching = false;
-
-        // Utility functions
-        function escapeRegExp(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-
-        function showLoading() {
-            if (!isSearching) {
-                isSearching = true;
-                matchInfoEl.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Buscando...';
-            }
-        }
-
-        function hideLoading() {
-            isSearching = false;
-        }
-
-        function highlightTextInLine(lineElement, query) {
-            const originalText = lineElement.dataset.originalText;
-            
-            if (!query || query.trim() === '') {
-                lineElement.innerHTML = originalText;
-                return;
-            }
-            
-            const escapedQuery = escapeRegExp(query);
-            const regex = new RegExp(`(${escapedQuery})`, 'gi');
-            
-            lineElement.innerHTML = originalText.replace(regex, `<span class="highlight">$1</span>`);
-        }
-
-        function updateMatchInfo() {
-            hideLoading();
-            
-            if (currentMatches.length === 0) {
-                const anyFilterActive = searchInput.value.trim() !== '' || 
-                                      Array.from(document.querySelectorAll('.level-check:checked')).length > 0 ||
-                                      document.getElementById('dateFilter').value !== '' ||
-                                      document.getElementById('loggerGXU').checked;
-                if (anyFilterActive) {
-                    matchInfoEl.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>Sin coincidencias';
-                } else {
-                     matchInfoEl.innerHTML = `<i class="bi bi-list-ul me-1"></i>${allLogLineElements.length} líneas`;
-                }
-                nextBtn.disabled = true;
-                prevBtn.disabled = true;
-            } else {
-                matchInfoEl.innerHTML = `<i class="bi bi-check-circle me-1"></i>${currentMatchIndex + 1} de ${currentMatches.length}`;
-                nextBtn.disabled = false;
-                prevBtn.disabled = false;
-            }
-        }
-        
-        function applyFilters() {
-            showLoading();
-            
-            requestAnimationFrame(() => {
-                const queryFromInput = searchInput.value;
-                const queryLower = queryFromInput.toLowerCase();
-                
-                const selectedLevels = Array.from(document.querySelectorAll('.level-check:checked'))
-                    .map(cb => cb.value.toLowerCase());
-                const selectedDate = document.getElementById('dateFilter').value;
-                const onlyGXU = document.getElementById('loggerGXU').checked;
-
-                if (currentMatchIndex !== -1 && currentMatches[currentMatchIndex] && currentMatches[currentMatchIndex].element) {
-                    currentMatches[currentMatchIndex].element.classList.remove('active-match');
-                }
-                
-                currentMatches = []; 
-                currentMatchIndex = -1;
-
-                allLogLineElements.forEach((lineElement) => {
-                    const originalLineText = lineElement.dataset.originalText;
-                    if (typeof originalLineText !== 'string') {
-                        console.warn("Elemento sin data-original-text:", lineElement);
-                        return; 
-                    }
-                    const textContentForFilter = originalLineText.toLowerCase();
-
-                    const matchText = queryLower === '' || textContentForFilter.includes(queryLower);
-                    
-                    const matchLevel = selectedLevels.length === 0 || selectedLevels.some(level => {
-                        const levelLower = level.toLowerCase();
-                        const levelPattern = ` ${levelLower} `;
-                        const startsWithLevel = textContentForFilter.startsWith(`${levelLower} `);
-                        const containsLevelWord = textContentForFilter.includes(levelPattern);
-                        return containsLevelWord || startsWithLevel;
-                    });
-
-                    const matchLogger = !onlyGXU || textContentForFilter.includes('genexususerlog');
-                    
-                    let matchDate = selectedDate === '';
-                    if (selectedDate !== '') {
-                        matchDate = originalLineText.startsWith(selectedDate);
-                    }
-                    
-                    const isFrontendMatch = matchText && matchLevel && matchLogger && matchDate;
-
-                    lineElement.style.display = '';
-                    lineElement.classList.remove('active-match');
-
-                    if (isFrontendMatch) {
-                        currentMatches.push({ element: lineElement });
-                        highlightTextInLine(lineElement, queryFromInput);
-                    } else {
-                        lineElement.innerHTML = originalLineText;
-                    }
-                });
-
-                updateNavigationState();
-            });
-        }
-
-        function updateNavigationState() {
-            if (currentMatches.length > 0) {
-                currentMatchIndex = 0;
-                navigateToMatch(currentMatchIndex);
-            } else {
-                updateMatchInfo();
-            }
-        }
-
-        function navigateToMatch(index) {
-            if (currentMatches.length === 0) {
-                updateMatchInfo();
-                return;
-            }
-            
-            if (index < 0 || index >= currentMatches.length) {
-                console.warn("Índice de navegación fuera de rango:", index);
-                return;
-            }
-
-            if (currentMatchIndex !== -1 && currentMatchIndex < currentMatches.length && currentMatches[currentMatchIndex].element) {
-                 currentMatches[currentMatchIndex].element.classList.remove('active-match');
-            }
-            
-            currentMatchIndex = index;
-            const targetMatchData = currentMatches[currentMatchIndex];
-
-            if (targetMatchData && targetMatchData.element) {
-                targetMatchData.element.classList.add('active-match');
-                
-                // Scroll suave sin efectos de zoom
-                targetMatchData.element.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center',
-                    inline: 'nearest'
-                });
-            }
-            updateMatchInfo();
-        }
-
-        // Event listeners
-        filterForm.addEventListener('submit', e => {
-            e.preventDefault();
-            applyFilters();
-        });
-
-        let searchTimeout;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(applyFilters, 300);
-        });
-        
-        filterControls.forEach(control => {
-            control.addEventListener('change', applyFilters);
-        });
-
-        clearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            applyFilters();
-        });
-
-        clearAllBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            filterControls.forEach(control => {
-                if (control.type === 'checkbox') control.checked = false;
-                if (control.type === 'date') control.value = '';
-            });
-            
-            allLogLineElements.forEach(line => {
-                line.style.display = '';
-                if (line.dataset.originalText) {
-                    line.innerHTML = line.dataset.originalText;
-                }
-                line.classList.remove('active-match');
-            });
-            
-            currentMatches = [];
-            currentMatchIndex = -1;
-            updateMatchInfo();
-        });
-
-        nextBtn.addEventListener('click', () => {
-            if (currentMatches.length === 0) return;
-            const newIndex = (currentMatchIndex + 1) % currentMatches.length;
-            navigateToMatch(newIndex);
-        });
-
-        prevBtn.addEventListener('click', () => {
-            if (currentMatches.length === 0) return;
-            const newIndex = (currentMatchIndex - 1 + currentMatches.length) % currentMatches.length;
-            navigateToMatch(newIndex);
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                if (e.key === 'Escape') searchInput.blur();
-                return;
-            }
-
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key.toLowerCase()) {
-                    case 'f':
-                        e.preventDefault();
-                        searchInput.focus();
-                        searchInput.select();
-                        break;
-                    case 'k':
-                        e.preventDefault();
-                        if (prevBtn.disabled === false) prevBtn.click();
-                        break;
-                    case 'j':
-                        e.preventDefault();
-                        if (nextBtn.disabled === false) nextBtn.click();
-                        break;
-                }
-            } else if (e.key === 'Escape') {
-                 searchInput.blur();
-            }
-        });
-
-        // Initialize
-        if (allLogLineElements.length === 0 && !logContainer.querySelector('.empty-state')) {
-            const emptyStateDiv = document.createElement('div');
-            emptyStateDiv.className = 'empty-state';
-            emptyStateDiv.innerHTML = '<i class="bi bi-file-earmark-excel"></i><p>No se cargaron líneas de log.</p>';
-            logContainer.appendChild(emptyStateDiv);
-            matchInfoEl.innerHTML = '<i class="bi bi-info-circle me-1"></i>0 líneas';
-        } else {
-            if (searchInput.value.trim() !== '') {
-                applyFilters();
-            } else {
-                matchInfoEl.innerHTML = `<i class="bi bi-list-ul me-1"></i>${allLogLineElements.length} líneas`;
-                nextBtn.disabled = true;
-                prevBtn.disabled = true;
-            }
-        }
-    });
-    </script>
-
-</body>
+    <script src="{{ url_for('static', filename='js/view_log.js') }}"></script>
+  </body>
 </html>
